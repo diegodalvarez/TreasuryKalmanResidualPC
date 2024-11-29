@@ -243,10 +243,11 @@ class SignalBacktest(DataCollect):
                 assign(
                     signal     = lambda x: np.where(x.variable == "PC1", -1 * x.lag_zscore, x.lag_zscore),
                     signal_rtn = lambda x: np.sign(x.signal) * x.PX_bps,
-                    security   = lambda x: x.security.str.split(" ").str[0]))
+                    security   = lambda x: x.security.str.split(" ").str[0]).
+                drop(columns = ["lag_zscore"]))
             
             df_out = (pd.concat([
-                df_yld, df_px]).
+                df_px, df_yld]).
                 dropna())
             
             if verbose == True: print("Saving data\n")
@@ -261,4 +262,4 @@ def main() -> None:
     df = SignalBacktest().get_yld_pca(verbose = True)
     df = SignalBacktest().get_fut_pca(verbose = True)
     
-if __name__ == "__main__": main()
+#if __name__ == "__main__": main()
