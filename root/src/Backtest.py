@@ -6,8 +6,10 @@ Created on Thu Nov 28 02:31:24 2024
 @author: diegoalvarez
 """
 import os
+import numpy as np
 import pandas as pd
 from   PCASignal import SignalBacktest
+
 import matplotlib.pyplot as plt
 
 class Backtest(SignalBacktest):
@@ -59,9 +61,11 @@ class Backtest(SignalBacktest):
     def get_rolling_sharpe(self, window: int = 30) -> pd.DataFrame: 
         
         df = (self.get_zscore().drop(
-            columns = ["signal", "PX_bps"]).
+            columns = ["PX_bps"]).
             assign(
-                group_var = lambda x: x.security + " " + x.input_var + " " + x.variable + " " + x.window).
+                group_var = lambda x: 
+                    x.security + " " + x.input_var + " " + 
+                    x.variable + " " + x.window).
             groupby("group_var").
             apply(self._get_rolling_sharpe, window).
             reset_index(drop = True).
@@ -137,17 +141,20 @@ class Backtest(SignalBacktest):
         except: 
             
             if verbose == True: print("Couldn't find ERC portoflios")
-            df_out = (self.get_max_sharpe().assign(
-                group_var = lambda x: x.input_var + " " + x.variable + " " + x.security).
-                drop(columns = ["lag_sharpe"]).
+            
+            df_roll_vol = (self.get_max_sharpe().assign(
+                group_var = lambda x: x.security + " " + x.input_var + " " + x.variable).
                 groupby("group_var").
                 apply(self._rolling_vol, self.window).
                 reset_index(drop = True).
-                drop(columns = ["group_var"]).
-                assign(group_var = lambda x: x.input_var + " " + x.variable).
+                drop(columns = ["group_var"]))
+            
+            df_out = (df_roll_vol.assign(
+                group_var = lambda x: x.input_var + " " + x.variable).
                 groupby("group_var").
                 apply(self._get_erc).
-                reset_index(drop = True))
+                reset_index(drop = True).
+                rename(columns = {"group_var": "port"}))
             
             if verbose == True: print("Saving data\n")
             df_out.to_parquet(path = file_path, engine = "pyarrow")

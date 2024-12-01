@@ -112,7 +112,7 @@ class SignalBacktest(DataCollect):
                 melt(id_vars = "date").
                 dropna().
                 merge(
-                    right = df_tmp[["date", "security", "PX_LAST"]], 
+                    right = df_tmp[["date", "security", "PX_pct"]], 
                     how   = "inner", 
                     on    = ["date", "security"]).
                 rename(columns = {"value": "PX_bps"}).
