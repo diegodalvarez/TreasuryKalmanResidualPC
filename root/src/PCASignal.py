@@ -262,4 +262,4 @@ def main() -> None:
     df = SignalBacktest().get_yld_pca(verbose = True)
     df = SignalBacktest().get_fut_pca(verbose = True)
     
-#if __name__ == "__main__": main()
+if __name__ == "__main__": main()
