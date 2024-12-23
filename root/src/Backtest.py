@@ -167,5 +167,5 @@ def main() -> None:
     df = Backtest().get_max_sharpe(verbose = True)
     df = Backtest().get_avg_rtn(verbose = True)
 
-if __name__ == "__main__": main()             
+#if __name__ == "__main__": main()
     
