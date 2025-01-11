@@ -9,8 +9,9 @@ import os
 import numpy as np
 import pandas as pd
 from   PCASignal import SignalBacktest
+from   tqdm import tqdm
 
-import matplotlib.pyplot as plt
+tqdm.pandas()
 
 class Backtest(SignalBacktest):
     
@@ -96,7 +97,7 @@ class Backtest(SignalBacktest):
             if verbose == True: print("Couldn't find data, collecting")
             df_out = (self.get_rolling_sharpe().groupby([
                 "date", "security", "variable", "input_var"]).
-                apply(self._get_max_sharpe).
+                progress_apply(lambda group: self._get_max_sharpe(group)).
                 reset_index(drop = True))
             
             if verbose == True: print("Saving data\n")
@@ -163,9 +164,9 @@ class Backtest(SignalBacktest):
 
 def main() -> None: 
     
-    df = Backtest().get_erc_portfolio(verbose = True)
     df = Backtest().get_max_sharpe(verbose = True)
+    df = Backtest().get_erc_portfolio(verbose = True)
     df = Backtest().get_avg_rtn(verbose = True)
 
-#if __name__ == "__main__": main()
+if __name__ == "__main__": main()
     
